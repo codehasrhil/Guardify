@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MdMenu } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
@@ -7,9 +7,17 @@ const Navbar = () => {
 
   const [OpenMenu, SetOpenMenu] = useState(false);
 
+  useEffect(() => {
+      if(OpenMenu){
+        document.body.style.overflow  = 'hidden';
+      } else {
+        document.body.style.overflow ='auto';
+      }
+  },[OpenMenu])
+
   return (
     <div>
-      <div className='fixed p-4  border-b-2 border-b-[#27363a] z-50 bg-[#141414] w-full text-white'>
+      <div className='fixed p-4 px-8 border-b-2 border-b-[#27363a] z-50 bg-[#141414] w-full text-white'>
         <div className='flex items-center justify-between'>
 
           {/* Logo */}
@@ -26,8 +34,8 @@ const Navbar = () => {
             </nav>
 
             {/* Button */}
-            <div className='text-lg bg-blue-500 p-2 px-4 text-black rounded-xl font-semibold'>
-              <button>Start Scanning</button>
+            <div className='text-lg bg-white p-2 px-4 text-black rounded-2xl font-semibold'>
+              <Link to='/scan' onClick={() => SetOpenMenu(false)}>Start Scanning</Link>
             </div>
           </div>
 
@@ -52,8 +60,8 @@ const Navbar = () => {
                 <Link to='/About' onClick={() => SetOpenMenu(false)}>About</Link>
               </nav>
             </div>
-            <div className='bg-blue-700 p-2 px-6 text-xl font-semibold rounded-xl'>
-              <button>Start Scanning</button>
+            <div className='bg-white p-2 px-6 text-xl text-black font-semibold rounded-2xl'>
+              <Link to='/Scan' onClick={() => SetOpenMenu(false)}>Start Scanning</Link>
             </div>
           </div>
      

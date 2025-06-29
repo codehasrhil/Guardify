@@ -2,7 +2,7 @@ import React from 'react'
 
 const Scan = () => {
   return (
-    <div>
+    <div className='pt-30 text-white'>
        this is scan 
     </div>
   )

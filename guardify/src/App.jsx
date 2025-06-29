@@ -11,7 +11,7 @@ const App = () => {
     <div className='bg-[#141414] h-full w-full'>
       <Router>
         <Navbar />
-        <div className='h-full'>
+        <div className='bg-[#141414]'>
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/Scan' element={<Scan />} />
