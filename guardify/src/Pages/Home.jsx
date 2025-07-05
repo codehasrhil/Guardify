@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import Ok from './../assets/Ok.png'
+import Ok from '../assets/ok.png'
 import { FaLink } from "react-icons/fa6";
 import { FaRegFile } from "react-icons/fa";
 import { IoMdTime } from "react-icons/io";
