@@ -31,7 +31,7 @@ const Scan = () => {
       const response = await axios.post('/.netlify/functions/scanUrl', data);
 
       console.log("Scan successful.. Id", response.data);
-      const id = response.data.id;
+      const id = response.data?.data?.id;;
       setScanId(id);
       await getScanResult(id);
 
