@@ -28,7 +28,12 @@ const Scan = () => {
 
     try {
 
-    const response = await axios.post('/.netlify/functions/scan', { url });
+      const response = await axios.post(`${BaseUrl}/urls`, data, {
+        headers: {
+          "x-apikey": ApiKey,
+          "Content-Type": 'application/x-www-form-urlencoded'
+        }
+      });
 
       console.log("Scan successful.. Id", response.data.data.id);
       const id = response.data.data.id;
