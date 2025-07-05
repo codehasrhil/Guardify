@@ -43,17 +43,13 @@ const Scan = () => {
   };
 
   const getScanResult = async (scanId) => {
-    try {
-      const response = await axios.get(`${BaseUrl}/analyses/${scanId}`, {
-        headers: {
-          "x-apikey": ApiKey,
-        }
-      })
-      setscanResult(response.data.data);
-    } catch (error) {
-      console.log("Scan is faild:", error);
-    }
+  try {
+    const response = await axios.get(`/.netlify/functions/getResult?id=${scanId}`);
+    setscanResult(response.data.data);
+  } catch (error) {
+    console.log("Scan is failed:", error);
   }
+};
 
 
   return (
