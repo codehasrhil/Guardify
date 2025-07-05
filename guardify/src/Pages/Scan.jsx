@@ -1,6 +1,6 @@
 import React, { Suspense, useState } from 'react'
 import DragDrop from '../Components/DragDrop'
-import { ApiKey, BaseUrl } from '../Config/Scrip'
+
 import axios from 'axios';
 import ScanResult from './ScanResult';
 
@@ -28,12 +28,7 @@ const Scan = () => {
 
     try {
 
-      const response = await axios.post(`${BaseUrl}/urls`, data, {
-        headers: {
-          "x-apikey": ApiKey,
-          "Content-Type": 'application/x-www-form-urlencoded'
-        }
-      });
+      const response = await axios.post('/.netlify/functions/scanUrl', data);
 
       console.log("Scan successful.. Id", response.data.data.id);
       const id = response.data.data.id;
