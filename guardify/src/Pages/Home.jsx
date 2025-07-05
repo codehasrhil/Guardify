@@ -10,7 +10,7 @@ const Home = () => {
     <div className='bg-[#141414] w-full mx-auto sm:w-[620px] md:w-[740px] lg:w-[940px] xl:w-[1024px]'>
       <div className='p-4 pt-24 w-full sm:p-6 sm:pt-24 '>
         <div
-          className="flex min-h-[280px] flex-col gap-6 sm:gap-8  bg-cover bg-center bg-no-repeat rounded-xl items-center justify-center  text-center  md:min-h-[320px] lg:min-h-[400px] xl:min-h-[460px]"
+          className="flex min-h-[280px] flex-col gap-6 sm:gap-8 border-2 border-[#161718]  bg-cover bg-center bg-no-repeat rounded-xl items-center justify-center  text-center  md:min-h-[320px] lg:min-h-[400px] xl:min-h-[460px]"
           style={{
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.4)), url(${Ok})`
           }}
@@ -20,7 +20,7 @@ const Home = () => {
               Guardify
             </h1>
             <h2 className='text-white text-lg px-4'>Advanced security solutions for your digital world.</h2>
-            <button className='bg-[#0CF2A5] py-2 px-6 mb-12 rounded-2xl text-lg font-bold'>Scan</button>
+            <Link to='/scan' className='bg-[#0CF2A5] py-2 px-6 mb-14 rounded-2xl text-lg font-bold'>Scan</Link>
           </div>
 
         </div>
