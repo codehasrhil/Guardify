@@ -1,6 +1,6 @@
 import React, { Suspense, useState } from 'react'
 import DragDrop from '../Components/DragDrop'
-import { ApiKey,BaseUrl } from '../Config/Scrip';
+import { ApiKey , BaseUrl } from '../Config/Scrip';
 import axios from 'axios';
 import ScanResult from './ScanResult';
 
