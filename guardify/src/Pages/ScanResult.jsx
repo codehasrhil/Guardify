@@ -12,7 +12,7 @@ const ScanResult = ({ result }) => {
       <div className='p-6 bg-[#1e1e1e] rounded-xl text-white mt-6'>
         <h2 className='text-2xl font-bold mb-4'>Scan Result</h2>
         <p><strong>Status:</strong> {status || "Unknown"}</p>
-        <p><strong>Verdict:</strong> {verdict || "Unknown"}</p>
+        <p><strong className={stats.malicious && stats.suspicious > 0 ? 'text-red-500' : 'text-green-600'}>Vardict:</strong> {verdict || "Unknown"}</p>
 
         <div className='mt-4 grid gap-2'>
           <p><strong>Harmless:</strong> {stats.harmless ?? 'N/A'}</p>
