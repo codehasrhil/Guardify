@@ -6,13 +6,14 @@ const ScanResult = ({ result }) => {
   const status = result?.attributes?.status;
   const stats = result?.attributes?.stats || {};
   const verdict = stats.malicious > 0 ? "Malicious" : stats.suspicious > 0 ? "Suspicious" : "Safe"; 
+  const verdictclass = verdict === 'Malicious' || verdict === 'Suspicious' ? 'text-red-500' :  verdict === 'Safe' ? 'text-green-600' : 'text-yellow-500'
 
   return (
     <div className='p-6'>
       <div className='p-6 bg-[#1e1e1e] rounded-xl text-white mt-6'>
         <h2 className='text-2xl font-bold mb-4'>Scan Result</h2>
         <p><strong>Status:</strong> {status || "Unknown"}</p>
-        <p><strong className={stats.malicious && stats.suspicious > 0 ? 'text-red-500' : 'text-green-600'}>Vardict:</strong> {verdict || "Unknown"}</p>
+        <p><strong className={verdictclass}>Vardict:</strong> {verdict || "Unknown"}</p>
 
         <div className='mt-4 grid gap-2'>
           <p><strong>Harmless:</strong> {stats.harmless ?? 'N/A'}</p>
