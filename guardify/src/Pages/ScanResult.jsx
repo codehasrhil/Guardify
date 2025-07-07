@@ -1,7 +1,7 @@
 import React from 'react'
 
 const ScanResult = ({ result }) => {
-  if (!result) return null;
+  // if (!result) return null;
 
   const status = result?.attributes?.status;
   const stats = result?.attributes?.stats || {};
@@ -19,7 +19,7 @@ const ScanResult = ({ result }) => {
         </div>
 
 
-        <div className='flex gap-4 justify-center mt-6'>
+        <div className='md:flex gap-4 justify-center mt-6 grid grid-cols-2'>
           <p className='border-2 border-l-4 rounded-lg border-white p-4 grid gap-2 text-center border-l-red-500'><strong className='text-xl'>Harmless:</strong>{stats.harmless ?? 'N/A'}</p>
           <p className='border-2 border-l-4 rounded-lg border-white p-4 grid text-center border-l-orange-500'><strong className='text-xl'>Malicious:</strong> {stats.malicious ?? 'N/A'}</p>
           <p className='border-2 border-l-4 rounded-lg border-white p-4 grid text-center border-l-green-500'><strong className='text-xl'>Suspicious:</strong> {stats.suspicious ?? 'N/A'}</p>
