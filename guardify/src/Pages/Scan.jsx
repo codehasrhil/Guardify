@@ -1,6 +1,5 @@
 import React, { Suspense, useState } from 'react'
 import DragDrop from '../Components/DragDrop'
-import { ApiKey , BaseUrl } from '../Config/Scrip';
 import axios from 'axios';
 import ScanResult from './ScanResult';
 
@@ -78,9 +77,9 @@ const Scan = () => {
             <div className='text-center text-gray-300 mt-6'> 🔄️Loding Scan Result.</div>
           )}
 
-          {!loading && scanResult && (
+          {!loading && scanResult && ( 
              <ScanResult result={scanResult} />
-          )}
+           )} 
 
 
           {/*File Scan*/}
