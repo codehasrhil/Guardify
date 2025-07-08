@@ -1,7 +1,7 @@
 import React from 'react'
 
 const ScanResult = ({ result }) => {
-  // if (!result) return null;
+  if (!result) return null;
 
   const status = result?.attributes?.status;
   const stats = result?.attributes?.stats || {};

@@ -77,9 +77,9 @@ const Scan = () => {
             <div className='text-center text-gray-300 mt-6'> 🔄️Loding Scan Result.</div>
           )}
 
-          {/* {!loading && scanResult && (  */}
+          {!loading && scanResult && ( 
              <ScanResult result={scanResult} />
-           {/* )}  */}
+          )}
 
 
           {/*File Scan*/}
