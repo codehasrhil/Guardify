@@ -1,6 +1,8 @@
 
 import FormData from 'form-data';
+import fetch from 'node-fetch';
 
+console.log("📦 scanFile.js loaded");
 
 export async function handler(event) {
     if (event.httpMethod === 'OPTIONS') {
