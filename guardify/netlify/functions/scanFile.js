@@ -2,7 +2,7 @@
 import FormData from 'form-data';
 
 
-export async function handler  (event) {
+export async function handler(event) {
     if (event.httpMethod === 'OPTIONS') {
         return {
             statusCode: 200,
@@ -11,45 +11,57 @@ export async function handler  (event) {
                 'Access-Control-Allow-Methods': 'POST, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type',
             },
-            body:JSON.stringify({ message: "Scan file function is working!" }),
+            body: JSON.stringify({ message: "Scan file function is working!" }),
         };
     };
     try {
-        const  base64file =  event.body;
+        const base64file = event.body;
 
-        const buffer =  Buffer.from(base64file,"base64");
+        const buffer = Buffer.from(base64file, "base64");
         const form = new FormData();
-        form.append('file',buffer,{filename:'upload.pdf'});
-        const uploadres = await fetch('https://www.virustotal.com/api/v3/files',{
-            method:'POST',
+        form.append('file', buffer, { filename: 'upload.pdf' });
+        const uploadres = await fetch('https://www.virustotal.com/api/v3/files', {
+            method: 'POST',
             headers: {
-                'x-apikey':process.env.VIRUSTOTAL_API_KEY,
+                'x-apikey': process.env.VIRUSTOTAL_API_KEY,
                 ...form.getHeaders(),
             },
-            body:form,
+            body: form,
         });
 
         const uploadData = await uploadres.json();
         const analysisId = uploadData.data.id;
 
-        const resultRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`,{
-            method:'GET',
-            headers:{
-                'x-apikey':process.env.VIRUSTOTAL_API_KEY,
+        const resultRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
+            method: 'GET',
+            headers: {
+                'x-apikey': process.env.VIRUSTOTAL_API_KEY,
             },
         });
 
         const resultData = await resultRes.json();
 
-        return{
-            statusCode:200,
-            headers:{
-                'Access-Control-Allow-Origin':'*',
+        return {
+            statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
             },
-            body:JSON.stringify(resultData),
+            body: JSON.stringify(resultData),
         };
 
     } catch (error) {
-         console.log('Scan failed:', error);
+        console.error('Scan failed:', error);
+
+        return {
+            statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                error: 'Scan failed',
+                details: error.message,
+                stack: error.stack,
+            }),
+        };
     }
 }
