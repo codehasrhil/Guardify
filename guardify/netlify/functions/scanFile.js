@@ -15,7 +15,7 @@ export async function handler(event) {
         };
     };
     try {
-        const {file} = json.parse(event.body);
+        const {file} = JSON.parse(event.body);
 
         const buffer = Buffer.from(file, "base64");
         const form = new FormData();
