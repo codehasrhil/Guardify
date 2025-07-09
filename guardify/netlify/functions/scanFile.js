@@ -15,9 +15,9 @@ export async function handler(event) {
         };
     };
     try {
-        const base64file = event.body;
+        const {file} = json.parse(event.body);
 
-        const buffer = Buffer.from(base64file, "base64");
+        const buffer = Buffer.from(file, "base64");
         const form = new FormData();
         form.append('file', buffer, { filename: 'upload.pdf' });
         const uploadres = await fetch('https://www.virustotal.com/api/v3/files', {
