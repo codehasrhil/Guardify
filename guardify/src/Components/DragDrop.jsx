@@ -37,6 +37,13 @@ const DragDrop = ({onScanResult}) => {
     const reader = new FileReader();
     reader.onload = async () => {
       const  base64Data = reader.result.split(',')[1];
+      if (!base64Data) {
+         console.error("Failed to extract base64 data");
+      return;
+    }
+
+      console.log("📤 Sending base64:", base64Data.slice(0, 100));
+
       try {
         const res = await  fetch('/.netlify/functions/scanFile',{
           method:'POST',
