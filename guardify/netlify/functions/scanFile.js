@@ -15,9 +15,26 @@ export async function handler(event) {
         };
     };
     try {
-        const {file} = JSON.parse(event.body);
 
-        const buffer = Buffer.from(file, "base64");
+
+        if(!event.body){
+            throw new Error('Request body is missing:');
+        }
+
+        let parsedbody;
+        try{
+            parsedbody = JSON.parse(event.body);
+        }catch (e){
+            throw new Error("invalid json body.")
+        }
+
+       const base64File = parsedbody.file;
+
+       if(!base64File){
+        throw new Error("Missing file")
+       }
+
+        const buffer = Buffer.from(base64File, "base64");
         const form = new FormData();
         form.append('file', buffer, { filename: 'upload.pdf' });
         const uploadres = await fetch('https://www.virustotal.com/api/v3/files', {
