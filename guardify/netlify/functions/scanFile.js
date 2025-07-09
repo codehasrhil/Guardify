@@ -35,6 +35,9 @@ export async function handler(event) {
         throw new Error("Missing file")
        }
 
+      console.log("📄 Base64 file length:", base64File.length);
+
+
         const buffer = Buffer.from(base64File, "base64");
         const form = new FormData();
         form.append('file', buffer, { filename: 'upload.pdf' });
