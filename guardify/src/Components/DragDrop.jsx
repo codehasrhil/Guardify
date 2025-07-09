@@ -38,10 +38,10 @@ const DragDrop = ({onScanResult}) => {
     reader.onload = async () => {
       const  base64Data = reader.result.split(',')[1];
       try {
-        const res = await  fetch('./netlify/functions/scanFile',{
+        const res = await  fetch('/.netlify/functions/scanFile',{
           method:'POST',
-          headers:{'contebt-type':'text/plain'},
-          body:base64Data,
+          headers:{'Content-Type': 'application/json'},
+          body: JSON.stringify({ file: base64Data }),
         })
         const data = await res.json();
         setResult(data);
