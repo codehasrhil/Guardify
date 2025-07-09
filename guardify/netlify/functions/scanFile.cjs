@@ -11,9 +11,9 @@ exports.handler = async (event) => {
                 'Access-Control-Allow-Methods': 'POST, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type',
             },
-            body:'',
+            body:JSON.stringify({ message: "Scan file function is working!" }),
         };
-    }
+    };
     try {
         const  base64file =  event.body;
 
