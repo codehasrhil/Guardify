@@ -1,11 +1,11 @@
-const fetch = require('node-fetch');
-const FromData = require('form-data')
+
+import FormData from 'form-data';
 
 
-exports.handler = async (event) => {
+export async function handler  (event) {
     if (event.httpMethod === 'OPTIONS') {
         return {
-            statuscode: 200,
+            statusCode: 200,
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -17,20 +17,20 @@ exports.handler = async (event) => {
     try {
         const  base64file =  event.body;
 
-        const buffer =  buffer.from(base64file,"base64");
-        const from = new FromData();
-        from.append('file',buffer,{filename:'upload.pdf'});
+        const buffer =  Buffer.from(base64file,"base64");
+        const form = new FormData();
+        form.append('file',buffer,{filename:'upload.pdf'});
         const uploadres = await fetch('https://www.virustotal.com/api/v3/files',{
             method:'POST',
             headers: {
-                'x-apikey':process.eventNames.VIRUSTOTAL_API_KEY,
+                'x-apikey':process.env.VIRUSTOTAL_API_KEY,
                 ...form.getHeaders(),
             },
-            body:from,
+            body:form,
         });
 
         const uploadData = await uploadres.json();
-        const analysisld = uploadData.data.id;
+        const analysisId = uploadData.data.id;
 
         const resultRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`,{
             method:'GET',
@@ -42,7 +42,7 @@ exports.handler = async (event) => {
         const resultData = await resultRes.json();
 
         return{
-            statuscode:200,
+            statusCode:200,
             headers:{
                 'Access-Control-Allow-Origin':'*',
             },
@@ -50,6 +50,6 @@ exports.handler = async (event) => {
         };
 
     } catch (error) {
-         console.error('Scan failed:', error);
+         console.log('Scan failed:', error);
     }
 }
