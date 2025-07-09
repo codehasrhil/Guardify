@@ -85,7 +85,7 @@ const Scan = () => {
           {/*File Scan*/}
 
           <div>
-            <DragDrop />
+            <DragDrop onScanResult={(data) => setscanResult(data)} />
           </div>
           <div className='px-6 py-4 grid gap-4'>
             <h1 className='text-xl font-bold'>Scanning Tips:</h1>
