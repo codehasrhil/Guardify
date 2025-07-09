@@ -17,10 +17,11 @@ export async function handler(event) {
     try {
 
 
-        if(!event.body){
-            throw new Error('Request body is missing:');
-        }
+         console.log("➡️ Received body type:", typeof event.body);
 
+        if (!event.body || typeof event.body !== 'string') {
+           throw new Error('Request body is missing or not a string.');
+    }
         let parsedbody;
         try{
             parsedbody = JSON.parse(event.body);
