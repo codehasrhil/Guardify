@@ -30,6 +30,11 @@ export async function handler(event) {
         });
 
         const uploadData = await uploadres.json();
+
+         if (!uploadres.ok || !uploadData.data || !uploadData.data.id) {
+         throw new Error('Upload failed — response: ' + JSON.stringify(uploadData));
+    }
+
         const analysisId = uploadData.data.id;
 
         const resultRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
