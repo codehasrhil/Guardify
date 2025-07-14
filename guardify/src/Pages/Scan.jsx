@@ -5,11 +5,12 @@ import ScanResult from './ScanResult';
 
 
 
-const Scan = () => {
+const Scan = ({ onScanResult }) => {
 
   const [url, setUrl] = useState("")
   const [scanId, setScanId] = useState('');
   const [scanResult, setscanResult] = useState(null);
+  const [fileScanresult, setFileScanResult] = useState(null)
   const [loading, setloding] = useState(false);
 
   const handleScanUrl = async () => {
@@ -42,13 +43,13 @@ const Scan = () => {
   };
 
   const getScanResult = async (scanId) => {
-  try {
-    const response = await axios.get(`/.netlify/functions/getResult?id=${scanId}`);
-    setscanResult(response.data.data);
-  } catch (error) {
-    console.log("Scan is failed:", error);
-  }
-};
+    try {
+      const response = await axios.get(`/.netlify/functions/getResult?id=${scanId}`);
+      setscanResult(response.data.data);
+    } catch (error) {
+      console.log("Scan is failed:", error);
+    }
+  };
 
 
   return (
@@ -69,6 +70,7 @@ const Scan = () => {
             <div>
               <button className='bg-[#303030] p-2 px-6  rounded-xl' onClick={handleScanUrl}>{loading ? 'Scanning...' : 'Scan URL'}</button>
             </div>
+           
           </div>
 
           {/* Result Section */}
@@ -77,16 +79,24 @@ const Scan = () => {
             <div className='text-center text-gray-300 mt-6'> 🔄️Loding Scan Result.</div>
           )}
 
-          {!loading && scanResult && ( 
-             <ScanResult result={scanResult} />
+          {!loading && scanResult && (
+            <ScanResult result={scanResult} />
           )}
 
 
           {/*File Scan*/}
 
           <div>
-            <DragDrop onScanResult={(data) => setscanResult(data)} />
+            <DragDrop onScanResult={(data) => setFileScanResult(data)} />
           </div>
+
+          {!loading && fileScanresult && (
+            <div className='mt-6'>
+              <ScanResult result={fileScanresult} />
+            </div>
+          )}
+
+
           <div className='px-6 py-4 grid gap-4'>
             <h1 className='text-xl font-bold'>Scanning Tips:</h1>
             <p className='font-semibold text-center text-gray-400'>For best results, ensure the URL is complete and accurate. For file scans, the maximum file size is 50MB. Larger files may take longer to scan.</p>
