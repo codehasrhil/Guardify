@@ -1,8 +1,12 @@
+exports.config = {
+  bodyParser: false,
+};
+
 const FormData = require('form-data');
 const Busboy = require('busboy');
 const fetch = require('node-fetch');
 
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -49,7 +53,6 @@ exports.handler = async (event, context) => {
         const form = new FormData();
         form.append('file', fileBuffer, { filename: 'upload.file' });
 
-        // Send to VirusTotal
         const vtRes = await fetch('https://www.virustotal.com/api/v3/files', {
           method: 'POST',
           headers: {
