@@ -40,7 +40,7 @@ const DragDrop = ({ onScanResult}) => {
     formData.append("file", file);
 
     try {
-      const res = await fetch('/.netlify/functions/scanFile', {
+      const res = await fetch('https://guardifyappp.netlify.app/.netlify/functions/scanFile', {
         method: "POST",
         body: formData,
       });
