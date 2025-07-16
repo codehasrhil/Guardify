@@ -42,9 +42,6 @@ const DragDrop = ({ onScanResult}) => {
     try {
       const res = await fetch('/.netlify/functions/scanFile', {
         method: "POST",
-        headers: {
-          "x-apikey": ApiKey,
-        },
         body: formData,
       });
 
