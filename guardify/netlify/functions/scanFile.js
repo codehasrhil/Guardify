@@ -1,95 +1,82 @@
+const FormData = require('form-data');
+const Busboy = require('busboy');
+const fetch = require('node-fetch');
 
-// import FormData from 'form-data';
-// import fetch from 'node-fetch';
+exports.handler = async (event, context) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+      body: 'OK',
+    };
+  }
 
-// console.log("📦 scanFile.js loaded");
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: 'Method Not Allowed',
+    };
+  }
 
-// export async function handler(event) {
-//     if (event.httpMethod === 'OPTIONS') {
-//         return {
-//             statusCode: 200,
-//             headers: {
-//                 'Access-Control-Allow-Origin': '*',
-//                 'Access-Control-Allow-Methods': 'POST, OPTIONS',
-//                 'Access-Control-Allow-Headers': 'Content-Type',
-//             },
-//             body: JSON.stringify({ message: "Scan file function is working!" }),
-//         };
-//     };
-//     try {
+  try {
+    const contentType = event.headers['content-type'] || event.headers['Content-Type'];
+    const busboy = new Busboy({ headers: { 'content-type': contentType } });
 
+    return await new Promise((resolve, reject) => {
+      let fileBuffer = null;
 
-//          console.log("➡️ Received body type:", typeof event.body);
+      busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+        const chunks = [];
+        file.on('data', data => chunks.push(data));
+        file.on('end', () => {
+          fileBuffer = Buffer.concat(chunks);
+        });
+      });
 
-//         if (!event.body || typeof event.body !== 'string') {
-//            throw new Error('Request body is missing or not a string.');
-//     }
-//         let parsedbody;
-//         try{
-//             parsedbody = JSON.parse(event.body);
-//         }catch (e){
-//             throw new Error("invalid json body.")
-//         }
+      busboy.on('finish', async () => {
+        if (!fileBuffer) {
+          return resolve({
+            statusCode: 400,
+            headers: { 'Access-Control-Allow-Origin': '*' },
+            body: JSON.stringify({ error: 'No file received' }),
+          });
+        }
 
-//        const base64File = parsedbody.file;
+        const form = new FormData();
+        form.append('file', fileBuffer, { filename: 'upload.file' });
 
-//        if(!base64File){
-//         throw new Error("Missing file")
-//        }
+        // Send to VirusTotal
+        const vtRes = await fetch('https://www.virustotal.com/api/v3/files', {
+          method: 'POST',
+          headers: {
+            'x-apikey': process.env.VIRUSTOTAL_API_KEY,
+            ...form.getHeaders(),
+          },
+          body: form,
+        });
 
-//       console.log("📄 Base64 file length:", base64File.length);
+        const vtData = await vtRes.json();
 
+        return resolve({
+          statusCode: vtRes.status,
+          headers: { 'Access-Control-Allow-Origin': '*' },
+          body: JSON.stringify(vtData),
+        });
+      });
 
-//         const buffer = Buffer.from(base64File, "base64");
-//         const form = new FormData();
-//         form.append('file', buffer, { filename: 'upload.pdf' });
-//         const uploadres = await fetch('https://www.virustotal.com/api/v3/files', {
-//             method: 'POST',
-//             headers: {
-//                 'x-apikey': process.env.VIRUSTOTAL_API_KEY,
-//                 ...form.getHeaders(),
-//             },
-//             body: form,
-//         });
+      busboy.write(event.body, event.isBase64Encoded ? 'base64' : 'binary');
+      busboy.end();
+    });
 
-//         const uploadData = await uploadres.json();
-
-//          if (!uploadres.ok || !uploadData.data || !uploadData.data.id) {
-//          throw new Error('Upload failed — response: ' + JSON.stringify(uploadData));
-//     }
-
-//         const analysisId = uploadData.data.id;
-
-//         const resultRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
-//             method: 'GET',
-//             headers: {
-//                 'x-apikey': process.env.VIRUSTOTAL_API_KEY,
-//             },
-//         });
-
-//         const resultData = await resultRes.json();
-
-//         return {
-//             statusCode: 200,
-//             headers: {
-//                 'Access-Control-Allow-Origin': '*',
-//             },
-//             body: JSON.stringify(resultData),
-//         };
-
-//     } catch (error) {
-//         console.error('Scan failed:', error);
-
-//         return {
-//             statusCode: 500,
-//             headers: {
-//                 'Access-Control-Allow-Origin': '*',
-//             },
-//             body: JSON.stringify({
-//                 error: 'Scan failed',
-//                 details: error.message,
-//                 stack: error.stack,
-//             }),
-//         };
-//     }
-// }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      headers: { 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ error: error.message, stack: error.stack }),
+    };
+  }
+};

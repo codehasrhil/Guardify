@@ -40,7 +40,7 @@ const DragDrop = ({ onScanResult}) => {
     formData.append("file", file);
 
     try {
-      const res = await fetch('https://www.virustotal.com/api/v3/files', {
+      const res = await fetch('/.netlify/functions/scanFile', {
         method: "POST",
         headers: {
           "x-apikey": ApiKey,
