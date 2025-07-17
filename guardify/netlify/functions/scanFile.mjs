@@ -1,63 +1,29 @@
-import fetch from "node-fetch";
-import FormData from "form-data";
-import busboy from "busboy";
-
 export async function handler(event) {
-  console.log("wee come to scan file")
   try {
     if (event.httpMethod !== "POST") {
       return { statusCode: 405, body: "Method Not Allowed" };
     }
 
-    const contentType = event.headers["content-type"] || event.headers["Content-Type"];
-    if (!contentType || !contentType.includes("multipart/form-data")) {
-      return {
-        statusCode: 400,
-        body: "Invalid Content-Type. Expected multipart/form-data.",
-      };
-    }
+    const { filename, content } = JSON.parse(event.body);
 
-    const bb = busboy({ headers: event.headers });
-    const fileChunks = [];
-    let fileName = "";
+    const base64Data = content.split(',')[1]; // remove Data URL prefix
+    const buffer = Buffer.from(base64Data, 'base64');
 
-    return new Promise((resolve, reject) => {
-      bb.on("file", (file, info) => {
-        fileName = info.filename;
-        file.on("data", (data) => fileChunks.push(data));
-      });
-
-      bb.on("close", async () => {
-        const fileBuffer = Buffer.concat(fileChunks);
-        const form = new FormData();
-        form.append("file", fileBuffer, fileName);
-
-        try {
-          const response = await fetch("https://www.virustotal.com/api/v3/files", {
-            method: "POST",
-            headers: {
-              "x-apikey": process.env.VIRUSTOTAL_API_KEY,
-              ...form.getHeaders(),
-            },
-            body: form,
-          });
-
-          const result = await response.json();
-
-          resolve({
-            statusCode: 200,
-            body: JSON.stringify(result),
-          });
-        } catch (error) {
-          resolve({
-            statusCode: 500,
-            body: JSON.stringify({ error: error.message }),
-          });
-        }
-      });
-
-      bb.end(Buffer.from(event.body, "base64"));
+    // Now send this `buffer` to VirusTotal API (or just simulate for testing)
+    const res = await fetch("https://www.virustotal.com/api/v3/files", {
+      method: "POST",
+      headers: {
+        "x-apikey": process.env.VIRUSTOTAL_API_KEY, // or inline for testing
+      },
+      body: buffer,
     });
+
+    const data = await res.json();
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "Scan started", data }),
+    };
   } catch (err) {
     return {
       statusCode: 500,
