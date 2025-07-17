@@ -1,8 +1,8 @@
-const FormData = require('form-data');
-const Busboy = require('busboy');
-const fetch = require('node-fetch');
+import FormData from 'form-data';
+import Busboy from 'busboy';
+import fetch from 'node-fetch';
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
