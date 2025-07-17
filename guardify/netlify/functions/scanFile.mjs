@@ -3,6 +3,7 @@ import FormData from "form-data";
 import busboy from "busboy";
 
 export async function handler(event) {
+  console.log("wee come to scan file")
   try {
     if (event.httpMethod !== "POST") {
       return { statusCode: 405, body: "Method Not Allowed" };
@@ -21,7 +22,7 @@ export async function handler(event) {
     let fileName = "";
 
     return new Promise((resolve, reject) => {
-      bb.on("file", (fieldname, file, info) => {
+      bb.on("file", (file, info) => {
         fileName = info.filename;
         file.on("data", (data) => fileChunks.push(data));
       });

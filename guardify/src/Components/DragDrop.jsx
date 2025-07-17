@@ -18,6 +18,7 @@ const DragDrop = ({ onScanResult}) => {
       console.log("Dropped file:", file);
       setFile(file);
       setResult(null)
+      console.log("file got");
     }
   }, []);
 
@@ -43,7 +44,9 @@ const DragDrop = ({ onScanResult}) => {
       const res = await fetch('https://guardifyappp.netlify.app/.netlify/functions/scanFile', {
         method: "POST",
         body: formData,
+        
       });
+      console.log("file send to netlify");
 
       if(!res.ok) {
         const errorBody = await res.text();
