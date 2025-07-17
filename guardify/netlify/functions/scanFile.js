@@ -1,7 +1,3 @@
-exports.config = {
-  bodyParser: false,
-};
-
 const FormData = require('form-data');
 const Busboy = require('busboy');
 const fetch = require('node-fetch');
@@ -51,7 +47,7 @@ exports.handler = async (event) => {
         }
 
         const form = new FormData();
-        form.append('file', fileBuffer, { filename: 'upload.file' });
+        form.append('file', fileBuffer, { filename: 'uploaded.file' });
 
         const vtRes = await fetch('https://www.virustotal.com/api/v3/files', {
           method: 'POST',
@@ -66,7 +62,10 @@ exports.handler = async (event) => {
 
         return resolve({
           statusCode: vtRes.status,
-          headers: { 'Access-Control-Allow-Origin': '*' },
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*',
+          },
           body: JSON.stringify(vtData),
         });
       });
