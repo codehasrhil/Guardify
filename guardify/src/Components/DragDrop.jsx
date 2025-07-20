@@ -33,78 +33,70 @@ const DragDrop = ({ onScanResult}) => {
     },
   });
 
-const handleScan = async () => {
-  if (!file) return;
-  setLoading(true);
+  const handleScan = async () => {
+    if (!file) return;
+    setLoading(true);
 
-  try {
-    const base64 = await toBase64(file);
+    const formData = new FormData();
+    formData.append("file", file);
 
-    const res = await fetch('https://guardifyappp.netlify.app/.netlify/functions/scanFile', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        filename: file.name,
-        content: base64,
-      }),
-    });
-
-    if (!res.ok) {
-      const errorBody = await res.text();
-      console.error(`Upload failed with status ${res.status}:`, errorBody);
-      alert(`Scan failed. Server responded with status ${res.status}.`);
-      setLoading(false);
-      return;
-    }
-
-    const uploadResult = await res.json();
-    const analysisId = uploadResult?.data?.id;
-
-    if (!analysisId) {
-      console.error("Invalid response from VirusTotal:", uploadResult);
-      alert("Scan failed: No analysis ID returned.");
-      setLoading(false);
-      return;
-    }
-
-    const pollResult = async () => {
-      const analysisRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
-        headers: {
-          "x-apikey": ApiKey,
-        },
+    try {
+      const res = await fetch('/.netlify/functions/scanFile', {
+        method: "POST",
+        body: formData,
+        
       });
+      console.log("file sedd to netligf")
+
+      if(!res.ok) {
+        const errorBody = await res.text();
+        console.error(`uploade faild with status ${res.status}:`, errorBody);
+        alert(`scan faild. server responded with status ${res.status}.`);
+        setLoading(false)
+        return;
+      }
+
+      const uploadResult = await res.json();
+      const analysisId = uploadResult?.data?.id;
+
+      const pollResult = async () => {
+        const analysisRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
+          headers: {
+            "x-apikey": ApiKey,
+          },
+        });
+
 
       const resultData = await analysisRes.json();
       const status = resultData?.data?.attributes?.status;
 
+      
+        if(!analysisId){
+          console.error("Invalid response from virusTotal:",uploadResult);
+          alert("scan failed: No analysis Id returned.");
+          setLoading(false);
+          return;
+        }
+
+
       if (status === 'completed') {
-        console.log("Scan completed:", resultData);
+        console.log("scan completed:", resultData)
         setResult(resultData);
         onScanResult?.(resultData.data);
         setLoading(false);
       } else {
-        console.log("Scan still in progress, retrying...");
+        console.log("scan still in progress,retrying...");
         setTimeout(pollResult, 3000);
       }
-    };
+    }
+      pollResult();
+    } catch (error) {
+      console.error("Scan failed:", error);
+      setLoading(false);
+    }
 
-    pollResult();
-  } catch (error) {
-    console.error("Scan failed:", error);
-    setLoading(false);
-  }
-};
+  };
 
-const toBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (err) => reject(err);
-  });
-  
   return (
     <div className='px-6 pt-12 grid gap-6 pb-6 '>
       <h1 className='text-4xl font-bold'>file Scan</h1>
