@@ -36,20 +36,23 @@ const DragDrop = ({ onScanResult}) => {
   const handleScan = async () => {
     if (!file) return;
     setLoading(true);
+    console.log("we are going to scan the file")
 
     const formData = new FormData();
     formData.append("file", file);
+    console.log("we get the file")
 
     try {
+      console.log("we are going to scan file")
       const res = await fetch('/.netlify/functions/scanFile', {
         method: "POST",
-        body: formData,
-        
+        body: formData,  
       });
-      console.log("file sedd to netligf")
+      
 
       if(!res.ok) {
         const errorBody = await res.text();
+        console.log("we got error here");
         console.error(`uploade faild with status ${res.status}:`, errorBody);
         alert(`scan faild. server responded with status ${res.status}.`);
         setLoading(false)
@@ -60,6 +63,7 @@ const DragDrop = ({ onScanResult}) => {
       const analysisId = uploadResult?.data?.id;
 
       const pollResult = async () => {
+        console.log("we are going to get scanID")
         const analysisRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
           headers: {
             "x-apikey": ApiKey,
