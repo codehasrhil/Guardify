@@ -47,6 +47,9 @@ const DragDrop = ({ onScanResult}) => {
       body: formData,
     });
 
+    const rawText = await res.text();
+    console.log("🧾 Full Raw Response from Netlify:", rawText);
+
     const { analysisId } = await res.json();
 
     console.log("VirusTotal Response:", res.data);
