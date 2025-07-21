@@ -2,8 +2,6 @@ const Busboy = require('busboy');
 const fetch = require('node-fetch');
 const FormData = require('form-data');
 
-const VIRUSTOTAL_API_KEY = process.env.VIRUSTOTAL_API_KEY;
-
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return {
@@ -29,53 +27,25 @@ exports.handler = async (event) => {
       try {
         formData.append('file', fileBuffer, fileName);
 
-        // Step 1: Upload file to VirusTotal
-        const uploadRes = await fetch('https://www.virustotal.com/api/v3/files', {
+        const res = await fetch('https://www.virustotal.com/api/v3/files', {
           method: 'POST',
           headers: {
-            'x-apikey': VIRUSTOTAL_API_KEY,
+            'x-apikey': process.env.VIRUSTOTAL_API_KEY,
           },
           body: formData,
         });
 
-        const uploadData = await uploadRes.json();
-        const analysisId = uploadData?.data?.id;
+        const data = await res.json();
 
-        if (!analysisId) {
-          return resolve({
-            statusCode: 500,
-            body: JSON.stringify({ error: 'No analysisId received' }),
-          });
-        }
-
-        // Step 2: Poll for scan result
-        const pollScanResult = async () => {
-          const analysisRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
-            headers: {
-              'x-apikey': VIRUSTOTAL_API_KEY,
-            },
-          });
-
-          const analysisData = await analysisRes.json();
-          const status = analysisData?.data?.attributes?.status;
-
-          if (status === 'completed') {
-            return resolve({
-              statusCode: 200,
-              body: JSON.stringify({ result: analysisData }),
-            });
-          } else {
-            console.log('Scan still in progress...');
-            setTimeout(pollScanResult, 3000); // retry
-          }
-        };
-
-        pollScanResult();
+        resolve({
+          statusCode: 200,
+          body: JSON.stringify({ analysisId: data?.data?.id }),
+        });
       } catch (err) {
-        console.error('Error during scan:', err);
+        console.error('Upload failed:', err);
         resolve({
           statusCode: 500,
-          body: JSON.stringify({ error: 'Upload or polling failed' }),
+          body: JSON.stringify({ error: 'Upload failed' }),
         });
       }
     });

@@ -33,7 +33,7 @@ const DragDrop = ({ onScanResult}) => {
     },
   });
 
-  const handleScan = async () => {
+ const handleScan = async () => {
   if (!file) return;
   setLoading(true);
 
@@ -41,29 +41,36 @@ const DragDrop = ({ onScanResult}) => {
   formData.append("file", file);
 
   try {
+    // Step 1: Upload the file
     const res = await fetch('/.netlify/functions/scanFile', {
-      method: "POST",
+      method: 'POST',
       body: formData,
     });
 
-    const data = await res.json();
+    const { analysisId } = await res.json();
 
-    if (!res.ok || !data.result) {
-      alert("Scan failed. Please try again.");
-      setLoading(false);
-      return;
-    }
+    if (!analysisId) throw new Error("No analysisId received");
 
-    console.log("Scan completed:", data.result);
-    setResult(data.result);
-    onScanResult?.(data.result.data);
+    // Step 2: Poll scan result every 3 seconds
+    const poll = setInterval(async () => {
+      const scanRes = await fetch(`/.netlify/functions/getScanResult?id=${analysisId}`);
+      const { result } = await scanRes.json();
+
+      const status = result?.data?.attributes?.status;
+      if (status === 'completed') {
+        clearInterval(poll);
+        setResult(result);
+        onScanResult?.(result.data);
+        setLoading(false);
+      }
+    }, 3000);
   } catch (err) {
     console.error("Scan failed:", err);
-    alert("Something went wrong.");
-  } finally {
+    alert("Scan failed");
     setLoading(false);
   }
 };
+
 
 
 
