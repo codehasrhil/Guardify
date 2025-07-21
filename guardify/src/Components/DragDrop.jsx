@@ -34,72 +34,38 @@ const DragDrop = ({ onScanResult}) => {
   });
 
   const handleScan = async () => {
-    if (!file) return;
-    setLoading(true);
-    console.log("we are going to scan the file")
+  if (!file) return;
+  setLoading(true);
 
-    const formData = new FormData();
-    formData.append("file", file);
-    console.log("we get the file")
+  const formData = new FormData();
+  formData.append("file", file);
 
-    try {
-      console.log("we are going to scan file")
-      const res = await fetch('/.netlify/functions/scanFile', {
-        method: "POST",
-        body: formData,  
-      });
-      
+  try {
+    const res = await fetch('/.netlify/functions/scanFile', {
+      method: "POST",
+      body: formData,
+    });
 
-      if(!res.ok) {
-        const errorBody = await res.text();
-        console.log("we got error here");
-        console.error(`uploade faild with status ${res.status}:`, errorBody);
-        alert(`scan faild. server responded with status ${res.status}.`);
-        setLoading(false)
-        return;
-      }
+    const data = await res.json();
 
-      const uploadResult = await res.json();
-      const analysisId = uploadResult?.data?.id;
-
-      const pollResult = async () => {
-        console.log("we are going to get scanID")
-        const analysisRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
-          headers: {
-            "x-apikey": ApiKey,
-          },
-        });
-
-
-      const resultData = await analysisRes.json();
-      const status = resultData?.data?.attributes?.status;
-
-      
-        if(!analysisId){
-          console.error("Invalid response from virusTotal:",uploadResult);
-          alert("scan failed: No analysis Id returned.");
-          setLoading(false);
-          return;
-        }
-
-
-      if (status === 'completed') {
-        console.log("scan completed:", resultData)
-        setResult(resultData);
-        onScanResult?.(resultData.data);
-        setLoading(false);
-      } else {
-        console.log("scan still in progress,retrying...");
-        setTimeout(pollResult, 3000);
-      }
-    }
-      pollResult();
-    } catch (error) {
-      console.error("Scan failed:", error);
+    if (!res.ok || !data.result) {
+      alert("Scan failed. Please try again.");
       setLoading(false);
+      return;
     }
 
-  };
+    console.log("Scan completed:", data.result);
+    setResult(data.result);
+    onScanResult?.(data.result.data);
+  } catch (err) {
+    console.error("Scan failed:", err);
+    alert("Something went wrong.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <div className='px-6 pt-12 grid gap-6 pb-6 '>

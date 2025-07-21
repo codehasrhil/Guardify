@@ -2,9 +2,9 @@ const Busboy = require('busboy');
 const fetch = require('node-fetch');
 const FormData = require('form-data');
 
-exports.handler = async (event) => {
+const VIRUSTOTAL_API_KEY = process.env.VIRUSTOTAL_API_KEY;
 
-    console.log("getting to console")
+exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -18,7 +18,7 @@ exports.handler = async (event) => {
     let fileBuffer = Buffer.alloc(0);
     let fileName = '';
 
-    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+    busboy.on('file', (fieldname, file, filename) => {
       fileName = filename;
       file.on('data', (data) => {
         fileBuffer = Buffer.concat([fileBuffer, data]);
@@ -29,25 +29,53 @@ exports.handler = async (event) => {
       try {
         formData.append('file', fileBuffer, fileName);
 
-        const response = await fetch('https://www.virustotal.com/api/v3/files', {
+        // Step 1: Upload file to VirusTotal
+        const uploadRes = await fetch('https://www.virustotal.com/api/v3/files', {
           method: 'POST',
           headers: {
-            'x-apikey': process.env.VIRUSTOTAL_API_KEY, // set this in Netlify dashboard
+            'x-apikey': VIRUSTOTAL_API_KEY,
           },
           body: formData,
         });
 
-        const data = await response.json();
+        const uploadData = await uploadRes.json();
+        const analysisId = uploadData?.data?.id;
 
-        resolve({
-          statusCode: 200,
-          body: JSON.stringify({ data }),
-        });
+        if (!analysisId) {
+          return resolve({
+            statusCode: 500,
+            body: JSON.stringify({ error: 'No analysisId received' }),
+          });
+        }
+
+        // Step 2: Poll for scan result
+        const pollScanResult = async () => {
+          const analysisRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
+            headers: {
+              'x-apikey': VIRUSTOTAL_API_KEY,
+            },
+          });
+
+          const analysisData = await analysisRes.json();
+          const status = analysisData?.data?.attributes?.status;
+
+          if (status === 'completed') {
+            return resolve({
+              statusCode: 200,
+              body: JSON.stringify({ result: analysisData }),
+            });
+          } else {
+            console.log('Scan still in progress...');
+            setTimeout(pollScanResult, 3000); // retry
+          }
+        };
+
+        pollScanResult();
       } catch (err) {
-        console.error('VirusTotal upload error:', err);
+        console.error('Error during scan:', err);
         resolve({
           statusCode: 500,
-          body: JSON.stringify({ error: 'Upload failed' }),
+          body: JSON.stringify({ error: 'Upload or polling failed' }),
         });
       }
     });
