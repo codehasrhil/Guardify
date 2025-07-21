@@ -49,7 +49,7 @@ const DragDrop = ({ onScanResult}) => {
 
     const { analysisId } = await res.json();
 
-    console.log("VirusTotal Response:", response.data);
+    console.log("VirusTotal Response:", res.data);
 
     if (!analysisId) throw new Error("No analysisId received");
 
