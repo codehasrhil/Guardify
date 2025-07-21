@@ -49,6 +49,8 @@ const DragDrop = ({ onScanResult}) => {
 
     const { analysisId } = await res.json();
 
+    console.log("VirusTotal Response:", res.data);
+
     if (!analysisId) throw new Error("No analysisId received");
 
     // Step 2: Poll scan result every 3 seconds
