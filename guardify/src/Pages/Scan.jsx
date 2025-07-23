@@ -55,9 +55,11 @@ const Scan = ({ onScanResult }) => {
 
         if (result.status === 'completed') {
           setscanResult(result);
+          console.log("result done.......")
         } else if (result.status === 'queued' && attempts < MaxAttempts){
             attempts++;
             setTimeout(poll,pollInterval)
+            console.log('taking attempts......')
         } else{
           console.log('scan did not complete in time: ',result.status)
           setscanResult(result);
