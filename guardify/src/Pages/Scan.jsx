@@ -69,10 +69,10 @@ const Scan = ({ onScanResult }) => {
         console.log("Scan is failed:", error);
       }
 
-      poll();
+     
     }
 
-
+    poll();
 
   };
 
