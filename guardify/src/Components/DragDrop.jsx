@@ -107,7 +107,7 @@ const DragDrop = ({ onScanResult}) => {
       </div>
 
       {loading && (
-            <div className='text-center text-gray-300 mt-6'> 🔄️Loding Scan Result. File Scanning Take Time,Please Wait</div>
+            <div className='text-center text-gray-300 mt-3'> 🔄️Loding Scan Result. File Scanning Take Time</div>
       )}
 
 
