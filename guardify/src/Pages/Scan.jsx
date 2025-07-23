@@ -43,12 +43,35 @@ const Scan = ({ onScanResult }) => {
   };
 
   const getScanResult = async (scanId) => {
-    try {
-      const response = await axios.get(`/.netlify/functions/getResult?id=${scanId}`);
-      setscanResult(response.data.data);
-    } catch (error) {
-      console.log("Scan is failed:", error);
+
+    const pollInterval = 3000;
+    const MaxAttempts = 10;
+    let attempts = 0;
+
+    const poll = async () => {
+      try {
+        const response = await axios.get(`/.netlify/functions/getResult?id=${scanId}`);
+        const result = response.data.data;
+
+        if (result.status === 'completed') {
+          setscanResult(result);
+        } else if (result.status === 'queued' && attempts < MaxAttempts){
+            attempts++;
+            setTimeout(poll,pollInterval)
+        } else{
+          console.log('scan did not complete in time: ',result.status)
+          setscanResult(result);
+        }
+      
+      } catch (error) {
+        console.log("Scan is failed:", error);
+      }
+
+      poll();
     }
+
+
+
   };
 
 
@@ -70,7 +93,7 @@ const Scan = ({ onScanResult }) => {
             <div>
               <button className='bg-[#303030] p-2 px-6  rounded-xl' onClick={handleScanUrl}>{loading ? 'Scanning...' : 'Scan URL'}</button>
             </div>
-           
+
           </div>
 
           {/* Result Section */}
